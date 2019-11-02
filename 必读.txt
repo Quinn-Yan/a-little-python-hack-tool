@@ -1,1 +1,2 @@
 pcap文件保存在sniff_data目录
+color.settint 文件用来改变程序运行是的颜色,其规则更color命令一样.

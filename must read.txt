@@ -1,1 +1,2 @@
 1. pcap file is save in /sniff_data
+2.color.settint file used to change the color of the program run, its rules more color command same.
