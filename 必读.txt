@@ -1,2 +1,3 @@
 pcap文件保存在sniff_data目录
 color.settint 文件用来改变程序运行是的颜色,其规则更color命令一样.
+如果你要设定sniff嗅探使用的网卡请打开iface.setting输入网卡名比如wlan0如果要使用默认网卡请输入None
