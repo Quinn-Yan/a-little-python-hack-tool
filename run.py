@@ -1,4 +1,6 @@
 #The program must be run in utf-8. 必须以UTF-8编码运行程序。
+import time
+tick = time.time()
 try:
     from scapy.all import *#要用的模块有scapy没有就在命令行跑这条命令windows:python -m pip install scapy liunx:sudo python -m pip install scapy
     from scapy.utils import PcapReader, PcapWriter
@@ -18,8 +20,7 @@ except:
     import sys
     input("按回车退出")
     sys.exit(0)
-
-import time, random, sys, uuid, os#导入需要的自带模块
+import random, sys, uuid, os#导入需要的自带模块
 
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
 print("必须以UTF-8编码运行程序")
@@ -101,7 +102,9 @@ def SYN_flood(): #SYN flood attack SYN洪水不用我说把
 def nmap_port_scan():#nmap扫描所有端口状态
     target = input("Enter the target IP like 127.0.0.1:")
     nm = nmap.PortScanner()
+    tick = time.time()
     nm.scan(target, '1-9999')
+    print("scan in ", time.time() - tick, "seconds.")
     for host in nm.all_hosts():#在nmap的扫描结果里的所有主机进行分析
         print('-----------------------------------')
         print('Host:%s(%s)'%(host,nm[host].hostname()))#打印计算机名称
@@ -123,7 +126,15 @@ def death_ping():
         send(IP(src=target,dst=pdst)/ICMP())
 
 def scapy_sniff():
-    data = sniff(prn=lambda x:x.summary())#scapy的sniff嗅探
+    file = open('iface.setting','r')
+    iface = file.read()
+    file.close()
+
+    if iface == 'None':
+        data = sniff(prn=lambda x:x.summary())#scapy的sniff嗅探
+    else:
+        data = sniff(iface=iface,prn=lambda x:x.summary())
+
     print("Start analyzing packets...")
     file = "sniff_data/" + time.strftime('%Y_%m_%d_%H_%M_%S') + ".pcap"
     writer = PcapWriter(file, append = True)
@@ -150,6 +161,7 @@ def macof():
         except KeyboardInterrupt:
             break
 
+print("Setup in ", time.time() - tick, "seconds.")#初始化计时
 while True:#喜闻乐见的主循环
 
     print("quit(0)")#告诉用户对应的功能
