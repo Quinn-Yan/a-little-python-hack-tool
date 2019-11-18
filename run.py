@@ -43,7 +43,7 @@ print("|   0x000189abab                      |         PYTHON         |")
 print("+-------------------------------------+------------------------+")
 print("|             github:www.github.com/marko1616                  |")
 print("+--------------------------------------------------------------+")
-print("|             bilibili:space.bilibili.com/385353604            |")
+print("|          bilibili:space.bilibili.com/385353604               |")
 print("+--------------------------------------------------------------+")
 
 def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
