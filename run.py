@@ -20,7 +20,7 @@ except:
     import sys
     input("按回车退出")
     sys.exit(0)
-import random, sys, uuid, os#导入需要的自带模块
+import random, sys, uuid, os, requests#导入需要的自带模块
 import socket as sk
 
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
@@ -34,6 +34,17 @@ print(mac)
 file = open("color.setting",'r')#让用户可以选择程序运行时的颜色
 color = file.read()#读取文件
 os.system("color " + color)#用os.system()改变颜色
+
+print("+-------------------------------------+------------------------+")
+print("|  MEN                                |  STR                   |")
+print("+-------------------------------------+------------------------+")
+print("|   0x000189abaa                      |         MOV 267 ACC    |")
+print("|   0x000189abab                      |         PYTHON         |")
+print("+-------------------------------------+------------------------+")
+print("|             github:www.github.com/marko1616                  |")
+print("+--------------------------------------------------------------+")
+print("|             bilibili:space.bilibili.com/385353604            |")
+print("+--------------------------------------------------------------+")
 
 def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
     
