@@ -20,7 +20,7 @@ except:
     import sys
     input("按回车退出")
     sys.exit(0)
-import random, sys, uuid, os, requests#导入需要的自带模块
+import random, sys, uuid, os#导入需要的自带模块
 import socket as sk
 
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
